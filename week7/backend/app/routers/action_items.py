@@ -5,7 +5,7 @@ from sqlalchemy import asc, desc, select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import ActionItem
+from ..models import ActionItem, Note
 from ..schemas import ActionItemCreate, ActionItemPatch, ActionItemRead
 
 router = APIRouter(prefix="/action-items", tags=["action_items"])
@@ -36,7 +36,11 @@ def list_items(
 
 @router.post("/", response_model=ActionItemRead, status_code=201)
 def create_item(payload: ActionItemCreate, db: Session = Depends(get_db)) -> ActionItemRead:
-    item = ActionItem(description=payload.description, completed=False)
+    if payload.note_id is not None:
+        note = db.get(Note, payload.note_id)
+        if not note:
+            raise HTTPException(status_code=404, detail="Note not found")
+    item = ActionItem(description=payload.description, completed=False, note_id=payload.note_id)
     db.add(item)
     db.flush()
     db.refresh(item)
