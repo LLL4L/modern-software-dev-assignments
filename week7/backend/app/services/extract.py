@@ -16,6 +16,8 @@ def extract_action_items(text: str) -> list[str]:
             results.append(cleaned)
         elif re.search(r"\[[ x]]", stripped):
             results.append(cleaned)
+
         elif stripped.endswith("!"):
-            results.append(stripped)
+            results.append(cleaned)
+
     return results
