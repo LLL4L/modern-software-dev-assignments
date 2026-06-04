@@ -29,8 +29,9 @@ def add_tags_to_note(note_id: int, payload: NoteWithTagIds, db: Session = Depend
     note = db.get(Note, note_id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-    tags = db.query(Tag).filter(Tag.id.in_(payload.tag_ids)).all()
-    if len(tags) != len(payload.tag_ids):
+    unique_tag_ids = list(set(payload.tag_ids))
+    tags = db.query(Tag).filter(Tag.id.in_(unique_tag_ids)).all()
+    if len(tags) != len(unique_tag_ids):
         raise HTTPException(status_code=404, detail="One or more tags not found")
     note.tags = list(set(note.tags) | set(tags))
     db.add(note)
