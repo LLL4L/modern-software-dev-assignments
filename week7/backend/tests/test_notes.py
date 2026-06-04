@@ -54,3 +54,58 @@ def test_extract_from_note_not_found(client):
     assert r.status_code == 404
 
 
+def test_get_note(client):
+    r = client.post("/notes/", json={"title": "Single", "content": "Fetch me"})
+    assert r.status_code == 201
+    note_id = r.json()["id"]
+
+    r = client.get(f"/notes/{note_id}")
+    assert r.status_code == 200
+    assert r.json()["title"] == "Single"
+
+
+def test_get_note_not_found(client):
+    r = client.get("/notes/99999")
+    assert r.status_code == 404
+
+
+def test_delete_note(client):
+    r = client.post("/notes/", json={"title": "Delete me", "content": "Bye"})
+    assert r.status_code == 201
+    note_id = r.json()["id"]
+
+    r = client.delete(f"/notes/{note_id}")
+    assert r.status_code == 204
+
+    r = client.get(f"/notes/{note_id}")
+    assert r.status_code == 404
+
+
+def test_delete_note_not_found(client):
+    r = client.delete("/notes/99999")
+    assert r.status_code == 404
+
+
+def test_patch_note_not_found(client):
+    r = client.patch("/notes/99999", json={"title": "Nope"})
+    assert r.status_code == 404
+
+
+def test_create_note_validation_empty_title(client):
+    r = client.post("/notes/", json={"title": "", "content": "valid"})
+    assert r.status_code == 422
+
+
+def test_create_note_validation_empty_content(client):
+    r = client.post("/notes/", json={"title": "valid", "content": ""})
+    assert r.status_code == 422
+
+
+def test_create_note_validation_title_too_long(client):
+    r = client.post("/notes/", json={"title": "x" * 201, "content": "valid"})
+    assert r.status_code == 422
+
+
+def test_create_note_validation_missing_fields(client):
+    r = client.post("/notes/", json={})
+    assert r.status_code == 422
