@@ -29,6 +29,12 @@ def test_extract_exclamation():
     assert "Ship it!" in extract_action_items("Ship it!")
 
 
+def test_extract_exclamation_strips_list_marker():
+    result = extract_action_items("- Ship it!")
+    assert "Ship it!" in result
+    assert "- Ship it!" not in result
+
+
 def test_extract_checkbox_unchecked():
     result = extract_action_items("[ ] buy milk")
     assert any("buy milk" in r for r in result)

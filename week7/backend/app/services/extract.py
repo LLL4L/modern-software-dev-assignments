@@ -19,5 +19,4 @@ def extract_action_items(text: str) -> list[str]:
 
         elif stripped.endswith("!"):
             results.append(cleaned)
-
     return results
