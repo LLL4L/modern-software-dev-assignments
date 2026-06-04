@@ -30,6 +30,11 @@ async def root() -> FileResponse:
     return FileResponse("frontend/index.html")
 
 
+@app.get("/health")
+async def health_check() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 # Routers
 app.include_router(notes_router.router)
 app.include_router(action_items_router.router)
